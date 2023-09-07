@@ -1,13 +1,18 @@
 import { Box, useTheme, Button, TextField } from "@mui/material";
 import { tokens } from "../theme";
 import { useNavigate } from "react-router-dom";
-import AddDeleteLoadTableRows from "../components/AddDeleteLoadTableRows";
 import { useState } from "react";
 import Header from "../components/Header";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createProgressInfo } from "../api/progressInfo";
 import { useSelector } from "react-redux";
+
+const validations = {
+  weight: (value) => value >= 1 && value <= 1000,
+  reps: (value) => value >= 1 && value <= 500,
+  sets: (value) => value >= 1 && value <= 9,
+  exerciseName: (value) => value.length > 0,
+};
 
 const ProgressForm = () => {
   const theme = useTheme();
@@ -15,84 +20,108 @@ const ProgressForm = () => {
   const user = useSelector((state) => state.user.user);
   const navigate = useNavigate();
   const [bodyPart, setBodyPart] = useState("");
-  const [rowsData, setRowsData] = useState([]);
-  const [exerciseNames, setExerciseNames] = useState([]);
-  const [exerciseLoads, setExerciseLoads] = useState([]);
 
-  const addExerciseTableRows = () => {
-    const rowsInput = {
-      exerciseName: "",
-    };
-    setRowsData([...rowsData, rowsInput]);
-  };
+  /**
+  
+  [
+    {
+      exerciseName: {value:"Bench Press", error:null},
+      exerciseDetails:[
+        {weight: {value:100, error:null}, reps: {value:10, error:null}, sets: {value:3, error:null}, notes: {value:"notes", error:null}},
+      ]
+    },
+    {
+      exerciseName: {value:"Bench Press 2", error:null},
+      exerciseDetails:[
+        {weight: {value:100, error:null}, reps: {value:10, error:null}, sets: {value:3, error:null}, notes: {value:"notes", error:null}},
+      ]
+    }
+  ]
 
-  const deleteExerciseTableRows = (index) => {
-    const rows = [...rowsData];
-    rows.splice(index, 1);
-    setRowsData(rows);
-  };
-
-  const handleExerciseTableRowsChange = (index, event) => {
-    const { name, value } = event.target;
-    const rowsInput = [...rowsData];
-    rowsInput[index][name] = value;
-    setRowsData(rowsInput);
+   */
+  const [data, setData] = useState([]);
+  const addExercise = () => {
+    setData((s) => {
+      const newData = [...s];
+      newData.push({ exerciseName: { value: "", error: null }, exerciseDetails: [] });
+      return newData;
+    });
   };
 
   const formSubmit = (e) => {
     e.preventDefault();
-    const email = user.email;
-    const exerciseNames = exerciseLoads.reduce((result, exerciseLoad) => {
-      const existingExercise = result.find(
-        (exercise) => exercise.exerciseName === exerciseLoad.exerciseName
-      );
+    console.log(data);
+  };
 
-      if (existingExercise) {
-        existingExercise.exerciseLoads.push({
-          weight: exerciseLoad.weight,
-          reps: exerciseLoad.reps,
-          sets: exerciseLoad.sets,
-        });
-      } else {
-        result.push({
-          exerciseName: exerciseLoad.exerciseName,
-          exerciseLoads: [
-            {
-              weight: exerciseLoad.weight,
-              reps: exerciseLoad.reps,
-              sets: exerciseLoad.sets,
-              notes: exerciseLoad.notes,
-            },
-          ],
-        });
-      }
+  const setExerciseNames = (name, index) => {
+    setData((s) => {
+      const newData = [...s];
+      newData[index].exerciseName.value = name;
+      newData[index].exerciseName.error = !validations.exerciseName(name);
+      return newData;
+    });
+  };
 
-      return result;
-    }, []);
-    const progress = { bodyPart, exerciseNames };
-    console.log("email: " + JSON.stringify(email));
-    console.log("progress: " + JSON.stringify(progress));
-    console.log("exerciseNames:" + JSON.stringify(exerciseNames));
+  const deleteExerciseNames = (index) => {
+    setData((s) => {
+      const newData = s.filter((item, i) => i !== index);
+      return [...newData];
+    });
+  };
 
-    // createProgressInfo(email, progress)
-    //   .then((response) => {
-    //     console.log(response);
-    //     navigate("/view");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+  const addDetailsExercise = (index) => {
+    setData((s) => {
+      const newData = [...s];
+      newData[index].exerciseDetails.push({
+        weight: { value: "", error: null },
+        reps: { value: "", error: null },
+        sets: { value: "", error: null },
+        notes: { value: "", error: null },
+      });
+      return newData;
+    });
+  };
+
+  const exerciseDetailValue = (i, j, key, value) => {
+    setData((s) => {
+      const newData = [...s];
+      newData[i].exerciseDetails[j][key].value = value;
+      if (validations[key]) newData[i].exerciseDetails[j][key].error = !validations[key](Number(value));
+      return newData;
+    });
+  };
+
+  const deleteExerciseDetails = (i, j) => {
+    setData((s) => {
+      const newData = [...s];
+      newData[i].exerciseDetails = newData[i].exerciseDetails.filter((item, index) => index !== j);
+      return newData;
+    });
+  };
+
+  const handleValidationExerciseDetails = (i, j, key, value) => {
+    if (validations[key])
+      setData((s) => {
+        const newData = [...s];
+        newData[i].exerciseDetails[j][key].error = !validations[key](Number(value));
+        return newData;
+      });
+  };
+
+  const handleValidationExerciseName = (i, value) => {
+    if (validations.exerciseName)
+      setData((s) => {
+        const newData = [...s];
+        newData[i].exerciseName.error = !validations.exerciseName(value);
+        return newData;
+      });
   };
 
   return (
     <>
       <form onSubmit={formSubmit} style={{ position: "relative" }}>
         <Box m="20px">
-          <Header
-            display="flex"
-            title="Cheers To Another Grind!!!"
-            subtitle="Add Your Gains"
-          />
+          <Header display="flex" title="Cheers To Another Grind!!!" subtitle="Add Your Gains" />
         </Box>
 
         <Box>
@@ -130,14 +159,13 @@ const ProgressForm = () => {
                   padding: "10px 20px",
                   marginTop: "10px",
                 }}
-                onClick={addExerciseTableRows}
+                onClick={addExercise}
               >
                 <AddIcon sx={{ mr: "10px" }} />
                 Add Exercise Names
               </Button>
             </div>
-            {rowsData.map((data, index) => {
-              const { exerciseName } = data;
+            {data.map((item, i) => {
               return (
                 <div
                   style={{
@@ -147,7 +175,7 @@ const ProgressForm = () => {
                     padding: "1rem",
                     gap: "1rem",
                   }}
-                  key={index}
+                  key={i}
                 >
                   <div
                     style={{
@@ -160,17 +188,18 @@ const ProgressForm = () => {
                       required
                       type="text"
                       label="Exercise Name"
-                      value={exerciseName}
+                      value={item.exerciseName.value}
                       placeholder="Barbell Squat"
                       InputLabelProps={{
                         shrink: true,
                       }}
                       focused={false}
-                      onChange={(event) =>
-                        handleExerciseTableRowsChange(index, event)
-                      }
+                      onChange={(event) => setExerciseNames(event.currentTarget.value, i)}
                       name="exerciseName"
                       variant="outlined"
+                      error={item.exerciseName.error}
+                      onBlur={(event) => handleValidationExerciseName(i, event.currentTarget.value)}
+                      helperText={item.exerciseName.error ? "Exercise name is required" : "Add exercise name."}
                     />
                     <Button
                       sx={{
@@ -179,19 +208,147 @@ const ProgressForm = () => {
                         fontWeight: "bold",
                         padding: "16px",
                       }}
-                      onClick={() => deleteExerciseTableRows(index)}
+                      onClick={() => deleteExerciseNames(i)}
                     >
                       <DeleteIcon />
                     </Button>
                   </div>
-                  <AddDeleteLoadTableRows
-                    exerciseNames={exerciseNames}
-                    setExerciseNames={setExerciseNames}
-                    exerciseLoads={exerciseLoads}
-                    setExerciseLoads={setExerciseLoads}
-                    rowsData={rowsData}
-                    index={index}
-                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
+                      flexDirection: "column",
+                      gap: "1rem",
+                    }}
+                  >
+                    <div>
+                      <Button
+                        sx={{
+                          backgroundColor: colors.blueAccent[700],
+                          color: colors.grey[100],
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          padding: "10px 20px",
+                        }}
+                        onClick={() => addDetailsExercise(i)}
+                      >
+                        <AddIcon sx={{ mr: "10px" }} />
+                        Add Details
+                      </Button>
+                    </div>
+                    {item.exerciseDetails.map((exerciseDetail, j) => (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                        key={j}
+                      >
+                        <TextField
+                          required
+                          type="number"
+                          label="Weight"
+                          value={exerciseDetail.weight.value}
+                          placeholder="0"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{
+                            min: 1,
+                            max: 1000,
+                          }}
+                          focused={false}
+                          onChange={(event) => exerciseDetailValue(i, j, "weight", event.currentTarget.value)}
+                          name="weight"
+                          variant="outlined"
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "weight", event.currentTarget.value)}
+                          error={exerciseDetail.weight.error}
+                          helperText={
+                            exerciseDetail.weight.error ? "Value must be between 1 and 1000" : "Add weights in kg."
+                          }
+                        />
+
+                        <TextField
+                          required
+                          type="number"
+                          label="Reps"
+                          value={exerciseDetail.reps.value}
+                          placeholder="0"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{
+                            min: 0,
+                            max: 500,
+                          }}
+                          focused={false}
+                          onChange={(event) => exerciseDetailValue(i, j, "reps", event.currentTarget.value)}
+                          name="reps"
+                          variant="outlined"
+                          error={exerciseDetail.reps.error}
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "reps", event.currentTarget.value)}
+                          helperText={
+                            exerciseDetail.reps.error ? "Value must be between 1 and 500" : "Add number of reps."
+                          }
+                        />
+
+                        <TextField
+                          required
+                          type="number"
+                          label="Sets"
+                          value={exerciseDetail.sets.value}
+                          placeholder="0"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{
+                            min: 1,
+                            max: 9,
+                          }}
+                          focused={false}
+                          onChange={(event) => exerciseDetailValue(i, j, "sets", event.currentTarget.value)}
+                          name="sets"
+                          variant="outlined"
+                          error={exerciseDetail.sets.error}
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "sets", event.currentTarget.value)}
+                          helperText={
+                            exerciseDetail.sets.error ? "Value must be between 1 and 9" : "Add number of sets."
+                          }
+                        />
+
+                        <TextField
+                          type="text"
+                          label="Notes"
+                          value={exerciseDetail.notes.value}
+                          placeholder="Dropped weight due to..."
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          focused={false}
+                          name="notes"
+                          variant="outlined"
+                          helperText={"Add notes."}
+                          onChange={(event) => exerciseDetailValue(i, j, "notes", event.currentTarget.value)}
+                        />
+                        <Button
+                          sx={{
+                            backgroundColor: colors.redAccent[700],
+                            color: colors.grey[100],
+                            fontWeight: "bold",
+                            padding: "16px",
+                            marginBottom: "19px",
+                          }}
+                          variant="outlined"
+                          onClick={() => deleteExerciseDetails(i, j)}
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}

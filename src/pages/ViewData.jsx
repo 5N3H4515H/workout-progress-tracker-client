@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../theme";
@@ -14,7 +14,6 @@ export default function ViewData() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const progress = useSelector((state) => state.progress.progress);
-  const [selectedProgress, setSelectedProgress] = useState(null);
 
   const navigate = useNavigate();
 
@@ -43,7 +42,6 @@ export default function ViewData() {
     } else {
       console.error("Selected row not found!");
     }
-    // setSelectedProgress(selectedRow);
   };
 
   return (

@@ -1,12 +1,13 @@
 import { Box, useTheme, Button, TextField } from "@mui/material";
 import { tokens } from "../theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import Header from "../components/Header";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSelector } from "react-redux";
 import { createProgressInfo } from "../api/progressInfo";
+import { useEffect } from "react";
 
 const validations = {
   weight: (value) => value >= 1 && value <= 1000,
@@ -15,11 +16,16 @@ const validations = {
   exerciseName: (value) => value.length > 0,
 };
 
-const ProgressForm = () => {
+const UpdateProgressForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.user.user);
   const navigate = useNavigate();
+
+  const progress = useSelector((state) => state.progress.progress);
+  const { id } = useParams();
+  const selectedProgress = progress.find((row) => row.id === Number(id));
+
   const [bodyPart, setBodyPart] = useState("");
 
   /**
@@ -41,6 +47,12 @@ const ProgressForm = () => {
 
    */
   const [exerciseData, setExerciseData] = useState([]);
+
+  useEffect(() => {
+    setExerciseData(selectedProgress);
+    console.log("exerciseData:" + JSON.stringify(exerciseData));
+  }, [selectedProgress, exerciseData]);
+
   const addExercise = () => {
     setExerciseData((s) => {
       const newData = [...s];
@@ -50,35 +62,6 @@ const ProgressForm = () => {
       });
       return newData;
     });
-  };
-
-  const formSubmit = (e) => {
-    e.preventDefault();
-    const email = user.email;
-    const exerciseNames = exerciseData.map((item) => {
-      const exerciseName = item.exerciseName.value;
-      const exerciseLoads = item.exerciseLoads.map((load) => {
-        const weight = load.weight.value;
-        const reps = load.reps.value;
-        const sets = load.sets.value;
-        const notes = load.notes.value;
-        return { weight, reps, sets, notes };
-      });
-      return { exerciseName, exerciseLoads };
-    });
-    const progress = { bodyPart, exerciseNames };
-    console.log("email: " + JSON.stringify(email));
-    console.log("progress: " + JSON.stringify(progress));
-    console.log("exerciseData:" + JSON.stringify(exerciseNames));
-
-    createProgressInfo(email, progress)
-      .then((response) => {
-        console.log(response);
-        navigate("/view");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const setExerciseNames = (name, index) => {
@@ -97,7 +80,7 @@ const ProgressForm = () => {
     });
   };
 
-  const addDetailsExercise = (index) => {
+  const addLoadDetails = (index) => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[index].exerciseLoads.push({
@@ -110,7 +93,7 @@ const ProgressForm = () => {
     });
   };
 
-  const exerciseDetailValue = (i, j, key, value) => {
+  const loadDetailsValue = (i, j, key, value) => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[i].exerciseLoads[j][key].value = value;
@@ -122,7 +105,7 @@ const ProgressForm = () => {
     });
   };
 
-  const deleteExerciseDetails = (i, j) => {
+  const deleteLoadDetails = (i, j) => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[i].exerciseLoads = newData[i].exerciseLoads.filter(
@@ -132,7 +115,7 @@ const ProgressForm = () => {
     });
   };
 
-  const handleValidationExerciseDetails = (i, j, key, value) => {
+  const handleValidationLoadDetails = (i, j, key, value) => {
     if (validations[key])
       setExerciseData((s) => {
         const newData = [...s];
@@ -150,6 +133,36 @@ const ProgressForm = () => {
         newData[i].exerciseName.error = !validations.exerciseName(value);
         return newData;
       });
+  };
+
+  const formSubmit = (e) => {
+    e.preventDefault();
+    const email = user.email;
+    console.log("e: " + JSON.stringify(e));
+    const exerciseNames = exerciseData.map((item) => {
+      const exerciseName = item.exerciseName.value;
+      const exerciseLoads = item.exerciseLoads.map((load) => {
+        const weight = load.weight.value;
+        const reps = load.reps.value;
+        const sets = load.sets.value;
+        const notes = load.notes.value;
+        return { weight, reps, sets, notes };
+      });
+      return { exerciseName, exerciseLoads };
+    });
+    const progress = { bodyPart, exerciseNames };
+    console.log("email: " + JSON.stringify(email));
+    console.log("progress: " + JSON.stringify(progress));
+    console.log("exerciseData:" + JSON.stringify(exerciseNames));
+
+    // createProgressInfo(email, progress)
+    //   .then((response) => {
+    //     console.log(response);
+    //     navigate("/view");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
 
   return (
@@ -184,7 +197,7 @@ const ProgressForm = () => {
                   shrink: true,
                 }}
                 focused={false}
-                value={bodyPart}
+                value={selectedProgress.bodyPart}
                 onChange={(e) => {
                   setBodyPart(e.target.value);
                 }}
@@ -204,7 +217,7 @@ const ProgressForm = () => {
                 Add Exercise Names
               </Button>
             </div>
-            {exerciseData.map((item, i) => {
+            {selectedProgress.exerciseNames.map((item, i) => {
               return (
                 <div
                   style={{
@@ -227,7 +240,7 @@ const ProgressForm = () => {
                       required
                       type="text"
                       label="Exercise Name"
-                      value={item.exerciseName.value}
+                      value={item.exerciseName}
                       placeholder="Barbell Squat"
                       InputLabelProps={{
                         shrink: true,
@@ -281,7 +294,7 @@ const ProgressForm = () => {
                           fontWeight: "bold",
                           padding: "10px 20px",
                         }}
-                        onClick={() => addDetailsExercise(i)}
+                        onClick={() => addLoadDetails(i)}
                       >
                         <AddIcon sx={{ mr: "10px" }} />
                         Add Details
@@ -301,7 +314,7 @@ const ProgressForm = () => {
                           required
                           type="number"
                           label="Weight"
-                          value={exerciseDetail.weight.value}
+                          value={exerciseDetail.weight}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -312,7 +325,7 @@ const ProgressForm = () => {
                           }}
                           focused={false}
                           onChange={(event) =>
-                            exerciseDetailValue(
+                            loadDetailsValue(
                               i,
                               j,
                               "weight",
@@ -322,7 +335,7 @@ const ProgressForm = () => {
                           name="weight"
                           variant="outlined"
                           onBlur={(event) =>
-                            handleValidationExerciseDetails(
+                            handleValidationLoadDetails(
                               i,
                               j,
                               "weight",
@@ -341,7 +354,7 @@ const ProgressForm = () => {
                           required
                           type="number"
                           label="Reps"
-                          value={exerciseDetail.reps.value}
+                          value={exerciseDetail.reps}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -352,7 +365,7 @@ const ProgressForm = () => {
                           }}
                           focused={false}
                           onChange={(event) =>
-                            exerciseDetailValue(
+                            loadDetailsValue(
                               i,
                               j,
                               "reps",
@@ -363,7 +376,7 @@ const ProgressForm = () => {
                           variant="outlined"
                           error={exerciseDetail.reps.error}
                           onBlur={(event) =>
-                            handleValidationExerciseDetails(
+                            handleValidationLoadDetails(
                               i,
                               j,
                               "reps",
@@ -381,7 +394,7 @@ const ProgressForm = () => {
                           required
                           type="number"
                           label="Sets"
-                          value={exerciseDetail.sets.value}
+                          value={exerciseDetail.sets}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -392,7 +405,7 @@ const ProgressForm = () => {
                           }}
                           focused={false}
                           onChange={(event) =>
-                            exerciseDetailValue(
+                            loadDetailsValue(
                               i,
                               j,
                               "sets",
@@ -403,7 +416,7 @@ const ProgressForm = () => {
                           variant="outlined"
                           error={exerciseDetail.sets.error}
                           onBlur={(event) =>
-                            handleValidationExerciseDetails(
+                            handleValidationLoadDetails(
                               i,
                               j,
                               "sets",
@@ -420,7 +433,7 @@ const ProgressForm = () => {
                         <TextField
                           type="text"
                           label="Notes"
-                          value={exerciseDetail.notes.value}
+                          value={exerciseDetail.notes}
                           placeholder="Dropped weight due to..."
                           InputLabelProps={{
                             shrink: true,
@@ -430,7 +443,7 @@ const ProgressForm = () => {
                           variant="outlined"
                           helperText={"Add notes."}
                           onChange={(event) =>
-                            exerciseDetailValue(
+                            loadDetailsValue(
                               i,
                               j,
                               "notes",
@@ -447,7 +460,7 @@ const ProgressForm = () => {
                             marginBottom: "19px",
                           }}
                           variant="outlined"
-                          onClick={() => deleteExerciseDetails(i, j)}
+                          onClick={() => deleteLoadDetails(i, j)}
                         >
                           <DeleteIcon />
                         </Button>
@@ -484,7 +497,7 @@ const ProgressForm = () => {
               }}
               variant="outlined"
               onClick={() => {
-                navigate("/dashboard");
+                navigate(`/progress/${selectedProgress.id}`);
               }}
             >
               Cancel
@@ -496,4 +509,4 @@ const ProgressForm = () => {
   );
 };
 
-export default ProgressForm;
+export default UpdateProgressForm;

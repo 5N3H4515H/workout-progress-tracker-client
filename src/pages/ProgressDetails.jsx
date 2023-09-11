@@ -2,17 +2,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
-import {
-  Box,
-  useTheme,
-  IconButton,
-  Button,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, useTheme, Button, TextField, Typography } from "@mui/material";
 import { tokens } from "../theme";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 
 export default function ProgressDetails() {
   const theme = useTheme();
@@ -41,7 +33,7 @@ export default function ProgressDetails() {
               padding: "10px 20px",
             }}
             onClick={() => {
-              navigate("/addORM");
+              navigate(`/update/${selectedProgress.id}`);
             }}
           >
             <EditIcon
@@ -153,6 +145,3 @@ export default function ProgressDetails() {
     </div>
   );
 }
-// ProgressDetails.propTypes = {
-//   progress: PropTypes.any.isRequired,
-// };

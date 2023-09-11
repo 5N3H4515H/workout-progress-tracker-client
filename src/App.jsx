@@ -7,6 +7,8 @@ import ProgressForm from "./pages/ProgressForm";
 import OneRepMaxForm from "./pages/OneRepMaxForm";
 import OrmData from "./pages/OrmData";
 import ProgressDetails from "./pages/ProgressDetails";
+import SearchExerciseWiseGraph from "./pages/SearchExerciseWiseGraph";
+import UpdateProgressForm from "./pages/UpdateProgressFrom";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,11 @@ const router = createBrowserRouter([
       {
         path: "/viewORM",
         element: <OrmData />,
+      },
+      { path: "/update/:id", element: <UpdateProgressForm /> },
+      {
+        path: "/searchExercise",
+        element: <SearchExerciseWiseGraph />,
       },
     ],
   },

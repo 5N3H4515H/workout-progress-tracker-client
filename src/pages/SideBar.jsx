@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { ProSidebarProvider, Menu, MenuItem } from "react-pro-sidebar";
+import {
+  ProSidebarProvider,
+  Sidebar as Sb,
+  Menu,
+  MenuItem,
+} from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 // import "react-pro-sidebar/dist/css/styles.css";
@@ -10,6 +15,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import SearchIcon from "@mui/icons-material/Search";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -107,9 +113,9 @@ const Sidebar = () => {
                 >
                   {`${user.firstName} ${user.lastName}`}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Coconut Thief{/* {`${user.roles}`} */}
-                </Typography>
+                {/* <Typography variant="h5" color={colors.greenAccent[500]}>
+                Coconut Thief {`${user.roles}`}
+                 </Typography> */}
               </Box>
               <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                 <Item
@@ -137,6 +143,20 @@ const Sidebar = () => {
                   title="Daily Progress"
                   to="/view"
                   icon={<PieChartOutlineOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                <Typography
+                  variant="h6"
+                  color={colors.grey[300]}
+                  sx={{ m: "15px 0 5px 20px" }}
+                >
+                  Search
+                </Typography>
+                <Item
+                  title="Exercise Wise"
+                  to="/searchExercise"
+                  icon={<SearchIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />
@@ -170,6 +190,20 @@ const Sidebar = () => {
                 title=""
                 to="/view"
                 icon={<PieChartOutlineOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 20px" }}
+              >
+                Search
+              </Typography>
+              <Item
+                title=""
+                to="/searchExercise"
+                icon={<SearchIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />

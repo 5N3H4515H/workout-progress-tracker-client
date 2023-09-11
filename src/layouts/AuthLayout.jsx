@@ -6,7 +6,7 @@ import { setUser } from "../store/slice/userSlice";
 import Sidebar from "../pages/SideBar";
 import { ColorModeContext, useMode } from "../theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import Topbar from "../pages/TopBar";
+import TopBar from "../pages/TopBar";
 
 const AuthLayout = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -47,13 +47,12 @@ const AuthLayout = () => {
                   width: "90%",
                 }}
               >
-                <Topbar setIsSidebar={setIsSidebar} />
+                <TopBar setIsSidebar={setIsSidebar} />
                 <Outlet />
               </main>
             </div>
           </ThemeProvider>
         </ColorModeContext.Provider>
-        {/* <Outlet /> */}
       </>
     );
   else return <Navigate to="/" />;

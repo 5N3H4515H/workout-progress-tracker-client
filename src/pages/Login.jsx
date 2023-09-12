@@ -30,7 +30,7 @@ export default function Login() {
         height: "100vh",
       }}
     >
-      <h1>Goggle Login</h1>
+      <h1>Google Login</h1>
       {loading && <p>loading...</p>}
       <GoogleLogin onGoogleSignIn={onGoogleSignIn} text="Login" />
     </div>

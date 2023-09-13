@@ -23,13 +23,10 @@ const UpdateProgressForm = () => {
   const navigate = useNavigate();
 
   const progress = useSelector((state) => state.progress.progress);
-  const { id } = useParams();
-  const selectedProgress = progress.find((row) => row.id === Number(id));
 
   const [bodyPart, setBodyPart] = useState("");
 
   /**
-  
   [
     {
       exerciseName: {value:"Bench Press", error:null},
@@ -47,11 +44,22 @@ const UpdateProgressForm = () => {
 
    */
   const [exerciseData, setExerciseData] = useState([]);
-
+  console.log(progress)
+  console.log(exerciseData)
   useEffect(() => {
-    setExerciseData(selectedProgress);
-    console.log("exerciseData:" + JSON.stringify(exerciseData));
-  }, [selectedProgress, exerciseData]);
+    setExerciseData(
+      progress[0].exerciseNames.map((item) => ({
+        exerciseName: { value: item.exerciseName, error: null },
+        exerciseLoads: item.exerciseLoads.map((load) => ({
+          weight: { value: load.weight, error: null },
+          reps: { value: load.reps, error: null },
+          sets: { value: load.sets, error: null },
+          notes: { value: load.notes, error: null },
+        })),
+      }))
+    );
+    setBodyPart(progress[0].bodyPart);
+  }, [progress]);
 
   const addExercise = () => {
     setExerciseData((s) => {
@@ -97,10 +105,7 @@ const UpdateProgressForm = () => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[i].exerciseLoads[j][key].value = value;
-      if (validations[key])
-        newData[i].exerciseLoads[j][key].error = !validations[key](
-          Number(value)
-        );
+      if (validations[key]) newData[i].exerciseLoads[j][key].error = !validations[key](Number(value));
       return newData;
     });
   };
@@ -108,9 +113,7 @@ const UpdateProgressForm = () => {
   const deleteLoadDetails = (i, j) => {
     setExerciseData((s) => {
       const newData = [...s];
-      newData[i].exerciseLoads = newData[i].exerciseLoads.filter(
-        (item, index) => index !== j
-      );
+      newData[i].exerciseLoads = newData[i].exerciseLoads.filter((item, index) => index !== j);
       return newData;
     });
   };
@@ -119,9 +122,7 @@ const UpdateProgressForm = () => {
     if (validations[key])
       setExerciseData((s) => {
         const newData = [...s];
-        newData[i].exerciseLoads[j][key].error = !validations[key](
-          Number(value)
-        );
+        newData[i].exerciseLoads[j][key].error = !validations[key](Number(value));
         return newData;
       });
   };
@@ -138,7 +139,6 @@ const UpdateProgressForm = () => {
   const formSubmit = (e) => {
     e.preventDefault();
     const email = user.email;
-    console.log("e: " + JSON.stringify(e));
     const exerciseNames = exerciseData.map((item) => {
       const exerciseName = item.exerciseName.value;
       const exerciseLoads = item.exerciseLoads.map((load) => {
@@ -151,9 +151,9 @@ const UpdateProgressForm = () => {
       return { exerciseName, exerciseLoads };
     });
     const progress = { bodyPart, exerciseNames };
-    console.log("email: " + JSON.stringify(email));
-    console.log("progress: " + JSON.stringify(progress));
-    console.log("exerciseData:" + JSON.stringify(exerciseNames));
+    console.log("email: " , email);
+    console.log("progress: " , progress);
+    console.log("exerciseData:" , exerciseNames);
 
     // createProgressInfo(email, progress)
     //   .then((response) => {
@@ -169,11 +169,7 @@ const UpdateProgressForm = () => {
     <>
       <form onSubmit={formSubmit} style={{ position: "relative" }}>
         <Box m="20px">
-          <Header
-            display="flex"
-            title="Cheers To Another Grind!!!"
-            subtitle="Add Your Gains"
-          />
+          <Header display="flex" title="Cheers To Another Grind!!!" subtitle="Add Your Gains" />
         </Box>
 
         <Box>
@@ -197,7 +193,7 @@ const UpdateProgressForm = () => {
                   shrink: true,
                 }}
                 focused={false}
-                value={selectedProgress.bodyPart}
+                value={bodyPart}
                 onChange={(e) => {
                   setBodyPart(e.target.value);
                 }}
@@ -217,7 +213,7 @@ const UpdateProgressForm = () => {
                 Add Exercise Names
               </Button>
             </div>
-            {selectedProgress.exerciseNames.map((item, i) => {
+            {exerciseData?.map((item, i) => {
               return (
                 <div
                   style={{
@@ -240,29 +236,18 @@ const UpdateProgressForm = () => {
                       required
                       type="text"
                       label="Exercise Name"
-                      value={item.exerciseName}
+                      value={item.exerciseName.value}
                       placeholder="Barbell Squat"
                       InputLabelProps={{
                         shrink: true,
                       }}
                       focused={false}
-                      onChange={(event) =>
-                        setExerciseNames(event.currentTarget.value, i)
-                      }
+                      onChange={(event) => setExerciseNames(event.currentTarget.value, i)}
                       name="exerciseName"
                       variant="outlined"
                       error={item.exerciseName.error}
-                      onBlur={(event) =>
-                        handleValidationExerciseName(
-                          i,
-                          event.currentTarget.value
-                        )
-                      }
-                      helperText={
-                        item.exerciseName.error
-                          ? "Exercise name is required"
-                          : ""
-                      }
+                      onBlur={(event) => handleValidationExerciseName(i, event.currentTarget.value)}
+                      helperText={item.exerciseName.error ? "Exercise name is required" : ""}
                     />
                     <Button
                       sx={{
@@ -300,7 +285,7 @@ const UpdateProgressForm = () => {
                         Add Details
                       </Button>
                     </div>
-                    {item.exerciseLoads.map((exerciseDetail, j) => (
+                    {item.exerciseLoads?.map((exerciseDetail, j) => (
                       <div
                         style={{
                           display: "flex",
@@ -314,7 +299,7 @@ const UpdateProgressForm = () => {
                           required
                           type="number"
                           label="Weight"
-                          value={exerciseDetail.weight}
+                          value={exerciseDetail.weight.value}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -324,29 +309,13 @@ const UpdateProgressForm = () => {
                             max: 1000,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            loadDetailsValue(
-                              i,
-                              j,
-                              "weight",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => loadDetailsValue(i, j, "weight", event.currentTarget.value)}
                           name="weight"
                           variant="outlined"
-                          onBlur={(event) =>
-                            handleValidationLoadDetails(
-                              i,
-                              j,
-                              "weight",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationLoadDetails(i, j, "weight", event.currentTarget.value)}
                           error={exerciseDetail.weight.error}
                           helperText={
-                            exerciseDetail.weight.error
-                              ? "Value must be between 1 and 1000"
-                              : "Add weights in kg."
+                            exerciseDetail.weight.error ? "Value must be between 1 and 1000" : "Add weights in kg."
                           }
                         />
 
@@ -354,7 +323,7 @@ const UpdateProgressForm = () => {
                           required
                           type="number"
                           label="Reps"
-                          value={exerciseDetail.reps}
+                          value={exerciseDetail.reps.value}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -364,29 +333,13 @@ const UpdateProgressForm = () => {
                             max: 500,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            loadDetailsValue(
-                              i,
-                              j,
-                              "reps",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => loadDetailsValue(i, j, "reps", event.currentTarget.value)}
                           name="reps"
                           variant="outlined"
                           error={exerciseDetail.reps.error}
-                          onBlur={(event) =>
-                            handleValidationLoadDetails(
-                              i,
-                              j,
-                              "reps",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationLoadDetails(i, j, "reps", event.currentTarget.value)}
                           helperText={
-                            exerciseDetail.reps.error
-                              ? "Value must be between 1 and 500"
-                              : "Add number of reps."
+                            exerciseDetail.reps.error ? "Value must be between 1 and 500" : "Add number of reps."
                           }
                         />
 
@@ -394,7 +347,7 @@ const UpdateProgressForm = () => {
                           required
                           type="number"
                           label="Sets"
-                          value={exerciseDetail.sets}
+                          value={exerciseDetail.sets.value}
                           placeholder="0"
                           InputLabelProps={{
                             shrink: true,
@@ -404,36 +357,20 @@ const UpdateProgressForm = () => {
                             max: 9,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            loadDetailsValue(
-                              i,
-                              j,
-                              "sets",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => loadDetailsValue(i, j, "sets", event.currentTarget.value)}
                           name="sets"
                           variant="outlined"
                           error={exerciseDetail.sets.error}
-                          onBlur={(event) =>
-                            handleValidationLoadDetails(
-                              i,
-                              j,
-                              "sets",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationLoadDetails(i, j, "sets", event.currentTarget.value)}
                           helperText={
-                            exerciseDetail.sets.error
-                              ? "Value must be between 1 and 9"
-                              : "Add number of sets."
+                            exerciseDetail.sets.error ? "Value must be between 1 and 9" : "Add number of sets."
                           }
                         />
 
                         <TextField
                           type="text"
                           label="Notes"
-                          value={exerciseDetail.notes}
+                          value={exerciseDetail.notes.value}
                           placeholder="Dropped weight due to..."
                           InputLabelProps={{
                             shrink: true,
@@ -442,14 +379,7 @@ const UpdateProgressForm = () => {
                           name="notes"
                           variant="outlined"
                           helperText={"Add notes."}
-                          onChange={(event) =>
-                            loadDetailsValue(
-                              i,
-                              j,
-                              "notes",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => loadDetailsValue(i, j, "notes", event.currentTarget.value)}
                         />
                         <Button
                           sx={{

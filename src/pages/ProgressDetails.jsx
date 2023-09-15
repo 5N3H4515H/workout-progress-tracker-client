@@ -1,15 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
-import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import Header from "../components/Header";
 import { Box, useTheme, Button, TextField, Typography } from "@mui/material";
 import { tokens } from "../theme";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteProgressInfo } from "../api/progressInfo";
 
 export default function ProgressDetails() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.user);
   const progress = useSelector((state) => state.progress.progress);
   const { id } = useParams();
   const selectedProgress = progress.find((row) => row.id === Number(id));
@@ -19,32 +21,67 @@ export default function ProgressDetails() {
     return <div>Loading...</div>;
   }
 
+  const handleDelete = (e) => {
+    e.preventDefault();
+    const email = user.email;
+    deleteProgressInfo(email, id)
+      .then((response) => {
+        console.log(response);
+        navigate("/view");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div>
       <Box m="20px">
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header display="flex" title={selectedProgress.bodyPart} />
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-            onClick={() => {
-              navigate(`/update/${selectedProgress.id}`);
-            }}
-          >
-            <EditIcon
+          <Box>
+            <Button
               sx={{
-                fontSize: "20px",
-                color: colors.greenAccent[500],
-                mr: "10px",
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                margin: "10px",
               }}
-            />
-            Edit
-          </Button>
+              onClick={() => {
+                navigate(`/update/${selectedProgress.id}`);
+              }}
+            >
+              <EditIcon
+                sx={{
+                  fontSize: "20px",
+                  color: colors.grey[100],
+                  mr: "10px",
+                }}
+              />
+              Edit
+            </Button>
+            <Button
+              sx={{
+                backgroundColor: colors.redAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+              }}
+              onClick={handleDelete}
+            >
+              <DeleteIcon
+                sx={{
+                  fontSize: "20px",
+                  color: colors.grey[100],
+                  mr: "10px",
+                }}
+              />
+              Delete
+            </Button>
+          </Box>
         </Box>
         {/* Render child data here */}
         {selectedProgress.exerciseNames.map((exercise) => (

@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSelector } from "react-redux";
-import { createProgressInfo } from "../api/progressInfo";
+import { updateProgressInfo } from "../api/progressInfo";
 import { useEffect } from "react";
 
 const validations = {
@@ -16,14 +16,15 @@ const validations = {
   exerciseName: (value) => value.length > 0,
 };
 
-const UpdateProgressForm = () => {
+export default function UpdateProgressForm() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.user.user);
   const navigate = useNavigate();
 
   const progress = useSelector((state) => state.progress.progress);
-
+  const { id } = useParams();
+  const selectedProgress = progress.find((row) => row.id === Number(id));
   const [bodyPart, setBodyPart] = useState("");
 
   /**
@@ -44,13 +45,14 @@ const UpdateProgressForm = () => {
 
    */
   const [exerciseData, setExerciseData] = useState([]);
-  console.log(progress)
-  console.log(exerciseData)
   useEffect(() => {
+    setBodyPart(selectedProgress.bodyPart);
     setExerciseData(
-      progress[0].exerciseNames.map((item) => ({
+      selectedProgress.exerciseNames.map((item) => ({
+        id: { value: item.id, error: null },
         exerciseName: { value: item.exerciseName, error: null },
         exerciseLoads: item.exerciseLoads.map((load) => ({
+          id: { value: load.id, error: null },
           weight: { value: load.weight, error: null },
           reps: { value: load.reps, error: null },
           sets: { value: load.sets, error: null },
@@ -58,13 +60,13 @@ const UpdateProgressForm = () => {
         })),
       }))
     );
-    setBodyPart(progress[0].bodyPart);
-  }, [progress]);
+  }, [selectedProgress]);
 
   const addExercise = () => {
     setExerciseData((s) => {
       const newData = [...s];
       newData.push({
+        id: { value: "", error: null },
         exerciseName: { value: "", error: null },
         exerciseLoads: [],
       });
@@ -92,6 +94,7 @@ const UpdateProgressForm = () => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[index].exerciseLoads.push({
+        id: { value: "", error: null },
         weight: { value: "", error: null },
         reps: { value: "", error: null },
         sets: { value: "", error: null },
@@ -105,7 +108,10 @@ const UpdateProgressForm = () => {
     setExerciseData((s) => {
       const newData = [...s];
       newData[i].exerciseLoads[j][key].value = value;
-      if (validations[key]) newData[i].exerciseLoads[j][key].error = !validations[key](Number(value));
+      if (validations[key])
+        newData[i].exerciseLoads[j][key].error = !validations[key](
+          Number(value)
+        );
       return newData;
     });
   };
@@ -113,7 +119,9 @@ const UpdateProgressForm = () => {
   const deleteLoadDetails = (i, j) => {
     setExerciseData((s) => {
       const newData = [...s];
-      newData[i].exerciseLoads = newData[i].exerciseLoads.filter((item, index) => index !== j);
+      newData[i].exerciseLoads = newData[i].exerciseLoads.filter(
+        (item, index) => index !== j
+      );
       return newData;
     });
   };
@@ -122,7 +130,9 @@ const UpdateProgressForm = () => {
     if (validations[key])
       setExerciseData((s) => {
         const newData = [...s];
-        newData[i].exerciseLoads[j][key].error = !validations[key](Number(value));
+        newData[i].exerciseLoads[j][key].error = !validations[key](
+          Number(value)
+        );
         return newData;
       });
   };
@@ -140,36 +150,39 @@ const UpdateProgressForm = () => {
     e.preventDefault();
     const email = user.email;
     const exerciseNames = exerciseData.map((item) => {
+      const id = item.id.value;
       const exerciseName = item.exerciseName.value;
       const exerciseLoads = item.exerciseLoads.map((load) => {
+        const id = load.id.value;
         const weight = load.weight.value;
         const reps = load.reps.value;
         const sets = load.sets.value;
         const notes = load.notes.value;
-        return { weight, reps, sets, notes };
+        return { id, weight, reps, sets, notes };
       });
-      return { exerciseName, exerciseLoads };
+      return { id, exerciseName, exerciseLoads };
     });
-    const progress = { bodyPart, exerciseNames };
-    console.log("email: " , email);
-    console.log("progress: " , progress);
-    console.log("exerciseData:" , exerciseNames);
+    const updateProgress = { id, bodyPart, exerciseNames };
 
-    // createProgressInfo(email, progress)
-    //   .then((response) => {
-    //     console.log(response);
-    //     navigate("/view");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    updateProgressInfo(email, updateProgress)
+      .then((response) => {
+        console.log(response);
+        navigate("/view");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
     <>
       <form onSubmit={formSubmit} style={{ position: "relative" }}>
         <Box m="20px">
-          <Header display="flex" title="Cheers To Another Grind!!!" subtitle="Add Your Gains" />
+          <Header
+            display="flex"
+            title="Cheers To Another Grind!!!"
+            subtitle="Add Your Gains"
+          />
         </Box>
 
         <Box>
@@ -242,12 +255,23 @@ const UpdateProgressForm = () => {
                         shrink: true,
                       }}
                       focused={false}
-                      onChange={(event) => setExerciseNames(event.currentTarget.value, i)}
+                      onChange={(event) =>
+                        setExerciseNames(event.currentTarget.value, i)
+                      }
                       name="exerciseName"
                       variant="outlined"
                       error={item.exerciseName.error}
-                      onBlur={(event) => handleValidationExerciseName(i, event.currentTarget.value)}
-                      helperText={item.exerciseName.error ? "Exercise name is required" : ""}
+                      onBlur={(event) =>
+                        handleValidationExerciseName(
+                          i,
+                          event.currentTarget.value
+                        )
+                      }
+                      helperText={
+                        item.exerciseName.error
+                          ? "Exercise name is required"
+                          : ""
+                      }
                     />
                     <Button
                       sx={{
@@ -309,13 +333,29 @@ const UpdateProgressForm = () => {
                             max: 1000,
                           }}
                           focused={false}
-                          onChange={(event) => loadDetailsValue(i, j, "weight", event.currentTarget.value)}
+                          onChange={(event) =>
+                            loadDetailsValue(
+                              i,
+                              j,
+                              "weight",
+                              event.currentTarget.value
+                            )
+                          }
                           name="weight"
                           variant="outlined"
-                          onBlur={(event) => handleValidationLoadDetails(i, j, "weight", event.currentTarget.value)}
+                          onBlur={(event) =>
+                            handleValidationLoadDetails(
+                              i,
+                              j,
+                              "weight",
+                              event.currentTarget.value
+                            )
+                          }
                           error={exerciseDetail.weight.error}
                           helperText={
-                            exerciseDetail.weight.error ? "Value must be between 1 and 1000" : "Add weights in kg."
+                            exerciseDetail.weight.error
+                              ? "Value must be between 1 and 1000"
+                              : "Add weights in kg."
                           }
                         />
 
@@ -333,13 +373,29 @@ const UpdateProgressForm = () => {
                             max: 500,
                           }}
                           focused={false}
-                          onChange={(event) => loadDetailsValue(i, j, "reps", event.currentTarget.value)}
+                          onChange={(event) =>
+                            loadDetailsValue(
+                              i,
+                              j,
+                              "reps",
+                              event.currentTarget.value
+                            )
+                          }
                           name="reps"
                           variant="outlined"
                           error={exerciseDetail.reps.error}
-                          onBlur={(event) => handleValidationLoadDetails(i, j, "reps", event.currentTarget.value)}
+                          onBlur={(event) =>
+                            handleValidationLoadDetails(
+                              i,
+                              j,
+                              "reps",
+                              event.currentTarget.value
+                            )
+                          }
                           helperText={
-                            exerciseDetail.reps.error ? "Value must be between 1 and 500" : "Add number of reps."
+                            exerciseDetail.reps.error
+                              ? "Value must be between 1 and 500"
+                              : "Add number of reps."
                           }
                         />
 
@@ -357,13 +413,29 @@ const UpdateProgressForm = () => {
                             max: 9,
                           }}
                           focused={false}
-                          onChange={(event) => loadDetailsValue(i, j, "sets", event.currentTarget.value)}
+                          onChange={(event) =>
+                            loadDetailsValue(
+                              i,
+                              j,
+                              "sets",
+                              event.currentTarget.value
+                            )
+                          }
                           name="sets"
                           variant="outlined"
                           error={exerciseDetail.sets.error}
-                          onBlur={(event) => handleValidationLoadDetails(i, j, "sets", event.currentTarget.value)}
+                          onBlur={(event) =>
+                            handleValidationLoadDetails(
+                              i,
+                              j,
+                              "sets",
+                              event.currentTarget.value
+                            )
+                          }
                           helperText={
-                            exerciseDetail.sets.error ? "Value must be between 1 and 9" : "Add number of sets."
+                            exerciseDetail.sets.error
+                              ? "Value must be between 1 and 9"
+                              : "Add number of sets."
                           }
                         />
 
@@ -379,7 +451,14 @@ const UpdateProgressForm = () => {
                           name="notes"
                           variant="outlined"
                           helperText={"Add notes."}
-                          onChange={(event) => loadDetailsValue(i, j, "notes", event.currentTarget.value)}
+                          onChange={(event) =>
+                            loadDetailsValue(
+                              i,
+                              j,
+                              "notes",
+                              event.currentTarget.value
+                            )
+                          }
                         />
                         <Button
                           sx={{
@@ -437,6 +516,4 @@ const UpdateProgressForm = () => {
       </form>
     </>
   );
-};
-
-export default UpdateProgressForm;
+}

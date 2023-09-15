@@ -7,14 +7,14 @@ import { createORMInfo } from "../api/ormInfo";
 import MenuItem from "@mui/material/MenuItem";
 import { useSelector } from "react-redux";
 
-const OneRepMaxForm = () => {
+export default function OneRepMaxForm() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const email = user.email;
   const [bodyWeight, setBodyWeight] = useState("");
-  const [timePeriod, setTimePeriod] = useState("");
+  const [timePeriod, setTimePeriod] = useState("May");
   const [squat1RM, setSquat1RM] = useState("");
   const [bench1RM, setBench1RM] = useState("");
   const [deadLift1RM, setDeadLift1RM] = useState("");
@@ -230,6 +230,4 @@ const OneRepMaxForm = () => {
       </form>
     </>
   );
-};
-
-export default OneRepMaxForm;
+}

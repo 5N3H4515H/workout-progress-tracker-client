@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../theme";
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, Button } from "@mui/material";
 import Header from "../components/Header";
-import { getORMInfo } from "../api/ormInfo";
+import { deleteORMInfo, getORMInfo } from "../api/ormInfo";
 import { setORMData } from "../store/slice/ormSlice";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function OrmData() {
   const theme = useTheme();
@@ -86,13 +87,42 @@ export default function OrmData() {
       align: "left",
     },
     {
-      field: "updateDateTime",
-      headerName: "Update Date",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
+      // field: "actions",
+      // headerName: "Actions",
+      // headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        return (
+          <Button
+            sx={{
+              backgroundColor: colors.redAccent[700],
+              fontWeight: "bold",
+              padding: "10px",
+            }}
+            onClick={(e) => handleDelete(e, params.row)}
+          >
+            <DeleteIcon
+              sx={{
+                fontSize: "20px",
+                color: colors.grey[100],
+              }}
+            />
+          </Button>
+        );
+      },
     },
   ];
+
+  const handleDelete = (e, row) => {
+    deleteORMInfo(row.id)
+      .then((response) => {
+        console.log(response);
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const dispatch = useDispatch();
   useEffect(() => {

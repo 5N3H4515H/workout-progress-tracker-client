@@ -7,7 +7,6 @@ import {
 } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
-// import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -41,7 +40,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = () => {
+export default function Sidebar() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -113,9 +112,6 @@ const Sidebar = () => {
                 >
                   {`${user.firstName} ${user.lastName}`}
                 </Typography>
-                {/* <Typography variant="h5" color={colors.greenAccent[500]}>
-                Coconut Thief {`${user.roles}`}
-                 </Typography> */}
               </Box>
               <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                 <Item
@@ -213,7 +209,7 @@ const Sidebar = () => {
       </ProSidebarProvider>
     </Box>
   );
-};
+}
 Item.propTypes = {
   title: PropTypes.any.isRequired,
   to: PropTypes.any.isRequired,
@@ -221,4 +217,3 @@ Item.propTypes = {
   selected: PropTypes.any.isRequired,
   setSelected: PropTypes.any.isRequired,
 };
-export default Sidebar;

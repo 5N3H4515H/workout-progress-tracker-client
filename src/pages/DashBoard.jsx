@@ -1,7 +1,6 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import Header from "../components/Header";
-import EditIcon from "@mui/icons-material/Edit";
 import ORMLineChart from "../components/ORMLineChart";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -35,7 +34,7 @@ export default function DashBoard() {
               }}
             >
               <AddIcon sx={{ mr: "10px" }} />
-              Add Daily Progress{/* {`${user.firstName} ${user.lastName}`} */}
+              Add Daily Progress
             </Button>
             <Button
               sx={{
@@ -79,18 +78,6 @@ export default function DashBoard() {
               One Rep Max
             </Typography>
           </Box>
-          {/* <Box>
-            <IconButton>
-              <EditIcon
-                sx={{
-                  fontSize: "20px",
-                  color: colors.greenAccent[500],
-                  mr: "5px",
-                }}
-              />
-              Edit
-            </IconButton>
-          </Box> */}
         </Box>
         <ORMLineChart />
       </Box>

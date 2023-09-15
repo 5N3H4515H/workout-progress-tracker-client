@@ -38,3 +38,24 @@ export const createORMInfo = async (email, requestData) => {
         return false;
     }
 };
+
+export const deleteORMInfo = async (requestData) => {
+    const path = '/api/delete-orm';
+
+    try {
+        const response = await fetch(`${API_URL}${path}`,{
+            method: "DELETE",
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: requestData,
+        });
+        if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+        return response;
+    } catch (e) {
+        console.error('deleteORMInfo Error: ', e.message);
+        return false;
+    }
+};

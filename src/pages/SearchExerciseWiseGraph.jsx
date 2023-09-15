@@ -80,10 +80,9 @@ export default function SearchExerciseWiseGraph() {
 */
   const handleSearch = async (e) => {
     e.preventDefault();
-    console.log(email, valueToBeSearched);
     getExerciseInfo(email, valueToBeSearched)
       .then((response) => {
-        console.log("response: " + JSON.stringify(response));
+        console.log("response: ", response);
         const convertedData = response.flatMap((exercise) =>
           exercise[1].map((loadItem) => ({
             date: exercise[0],
@@ -91,10 +90,7 @@ export default function SearchExerciseWiseGraph() {
             reps: parseInt(loadItem.reps),
           }))
         );
-        console.log("convertedData: " + JSON.stringify(convertedData));
         setLoadData(convertedData);
-
-        console.log("hui: " + JSON.stringify(loadData));
         {
           response.length > 0 ? "" : setIsFetched("Data Not Found!");
         }

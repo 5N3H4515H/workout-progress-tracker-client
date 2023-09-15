@@ -15,7 +15,7 @@ const validations = {
   exerciseName: (value) => value.length > 0,
 };
 
-const ProgressForm = () => {
+export default function ProgressForm() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.user.user);
@@ -494,6 +494,4 @@ const ProgressForm = () => {
       </form>
     </>
   );
-};
-
-export default ProgressForm;
+}

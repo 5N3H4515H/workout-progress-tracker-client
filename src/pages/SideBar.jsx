@@ -177,7 +177,7 @@ export default function Sidebar() {
               </Typography>
               <Item
                 title=""
-                to="/addNew"
+                to="/viewORM"
                 icon={<BarChartOutlinedIcon />}
                 selected={selected}
                 setSelected={setSelected}

@@ -189,20 +189,7 @@ export default function ProgressForm() {
                   setBodyPart(e.target.value);
                 }}
               />
-              <Button
-                sx={{
-                  backgroundColor: colors.blueAccent[700],
-                  color: colors.grey[100],
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  padding: "10px 20px",
-                  marginTop: "10px",
-                }}
-                onClick={addExercise}
-              >
-                <AddIcon sx={{ mr: "10px" }} />
-                Add Exercise Names
-              </Button>
+              
             </div>
             {exerciseData.map((item, i) => {
               return (
@@ -457,6 +444,20 @@ export default function ProgressForm() {
                 </div>
               );
             })}
+            <Button
+                sx={{
+                  backgroundColor: colors.blueAccent[700],
+                  color: colors.grey[100],
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  padding: "10px 20px",
+                  marginLeft: "10px",
+                }}
+                onClick={addExercise}
+              >
+                <AddIcon sx={{ mr: "10px" }} />
+                Add Exercise Names
+            </Button>
             <Button
               sx={{
                 backgroundColor: colors.blueAccent[700],

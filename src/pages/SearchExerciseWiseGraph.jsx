@@ -32,6 +32,8 @@ export default function SearchExerciseWiseGraph() {
 
   const green = tokens("dark").greenAccent[600];
   const red = tokens("dark").redAccent[600];
+  const blue = tokens("dark").blueAccent[600];
+
 
   const tickInterval = 5;
   const maxTick = 300;
@@ -88,6 +90,7 @@ export default function SearchExerciseWiseGraph() {
             date: exercise[0],
             weight: parseFloat(loadItem.weight),
             reps: parseInt(loadItem.reps),
+            notes: loadItem.notes,
           }))
         );
         setLoadData(convertedData);
@@ -179,6 +182,12 @@ export default function SearchExerciseWiseGraph() {
                 type="monotone"
                 dataKey="reps"
                 stroke={red}
+                activeDot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="notes"
+                stroke={blue}
                 activeDot={{ r: 4 }}
               />
             </LineChart>

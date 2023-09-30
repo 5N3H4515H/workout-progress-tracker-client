@@ -9,8 +9,8 @@ import { useSelector } from "react-redux";
 import { createProgressInfo } from "../api/progressInfo";
 
 const validations = {
-  weight: (value) => value >= 1 && value <= 1000,
-  reps: (value) => value >= 1 && value <= 500,
+  weight: (value) => value >= 1 && value <= 1000 || value == "Body Weight",
+  reps: (value) => value >= 1 && value <= 500 || value == "Failure",
   sets: (value) => value >= 1 && value <= 9,
   exerciseName: (value) => value.length > 0,
 };
@@ -115,9 +115,7 @@ export default function ProgressForm() {
       const newData = [...s];
       newData[i].exerciseLoads[j][key].value = value;
       if (validations[key])
-        newData[i].exerciseLoads[j][key].error = !validations[key](
-          Number(value)
-        );
+        newData[i].exerciseLoads[j][key].error = !validations[key](value);
       return newData;
     });
   };
@@ -136,9 +134,7 @@ export default function ProgressForm() {
     if (validations[key])
       setExerciseData((s) => {
         const newData = [...s];
-        newData[i].exerciseLoads[j][key].error = !validations[key](
-          Number(value)
-        );
+        newData[i].exerciseLoads[j][key].error = !validations[key](value);
         return newData;
       });
   };
@@ -286,7 +282,7 @@ export default function ProgressForm() {
                       >
                         <TextField
                           required
-                          type="number"
+                          type="text"
                           label="Weight"
                           value={exerciseDetail.weight.value}
                           placeholder="0"
@@ -319,14 +315,14 @@ export default function ProgressForm() {
                           error={exerciseDetail.weight.error}
                           helperText={
                             exerciseDetail.weight.error
-                              ? "Value must be between 1 and 1000"
+                              ? "Value must be (between 1 and 1000) / Body Weight"
                               : "Add weights in kg."
                           }
                         />
 
                         <TextField
                           required
-                          type="number"
+                          type="text"
                           label="Reps"
                           value={exerciseDetail.reps.value}
                           placeholder="0"
@@ -359,7 +355,7 @@ export default function ProgressForm() {
                           }
                           helperText={
                             exerciseDetail.reps.error
-                              ? "Value must be between 1 and 500"
+                              ? "Value must be (between 1 and 500) / Failure"
                               : "Add number of reps."
                           }
                         />

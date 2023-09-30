@@ -9,8 +9,8 @@ import { useSelector } from "react-redux";
 import { createProgressInfo } from "../api/progressInfo";
 
 const validations = {
-  weight: (value) => value >= 1 && value <= 1000 || value == "Body Weight",
-  reps: (value) => value >= 1 && value <= 500 || value == "Failure",
+  weight: (value) => (value >= 1 && value <= 1000) || value == "Body Weight",
+  reps: (value) => (value >= 1 && value <= 500) || value == "Failure",
   sets: (value) => value >= 1 && value <= 9,
   exerciseName: (value) => value.length > 0,
 };
@@ -54,6 +54,28 @@ export default function ProgressForm() {
 
   const formSubmit = (e) => {
     e.preventDefault();
+
+    let isValid = true;
+    const data = JSON.parse(JSON.stringify(exerciseData));
+    for (let i = 0; i < data.length; i++) {
+      data[i].exerciseName.error = !validations.exerciseName(data[i].exerciseName.value);
+      if (data[i].exerciseName.error) isValid = false;
+
+      for (let j = 0; j < data[i].exerciseLoads.length; j++) {
+        data[i].exerciseLoads[j].weight.error = !validations.weight(data[i].exerciseLoads[j].weight.value);
+        if (data[i].exerciseLoads[j].weight.error) isValid = false;
+        data[i].exerciseLoads[j].reps.error = !validations.reps(data[i].exerciseLoads[j].reps.value);
+        if (data[i].exerciseLoads[j].reps.error) isValid = false;
+        data[i].exerciseLoads[j].sets.error = !validations.sets(data[i].exerciseLoads[j].sets.value);
+        if (data[i].exerciseLoads[j].sets.error) isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      setExerciseData(data);
+      return;
+    }
+
     const email = user.email;
     const exerciseNames = exerciseData.map((item) => {
       const exerciseName = item.exerciseName.value;
@@ -114,8 +136,7 @@ export default function ProgressForm() {
     setExerciseData((s) => {
       const newData = [...s];
       newData[i].exerciseLoads[j][key].value = value;
-      if (validations[key])
-        newData[i].exerciseLoads[j][key].error = !validations[key](value);
+      if (validations[key]) newData[i].exerciseLoads[j][key].error = !validations[key](value);
       return newData;
     });
   };
@@ -123,9 +144,7 @@ export default function ProgressForm() {
   const deleteExerciseDetails = (i, j) => {
     setExerciseData((s) => {
       const newData = [...s];
-      newData[i].exerciseLoads = newData[i].exerciseLoads.filter(
-        (item, index) => index !== j
-      );
+      newData[i].exerciseLoads = newData[i].exerciseLoads.filter((item, index) => index !== j);
       return newData;
     });
   };
@@ -152,11 +171,7 @@ export default function ProgressForm() {
     <>
       <form onSubmit={formSubmit} style={{ position: "relative" }}>
         <Box m="20px">
-          <Header
-            display="flex"
-            title="Cheers To Another Grind!!!"
-            subtitle="Add Your Gains"
-          />
+          <Header display="flex" title="Cheers To Another Grind!!!" subtitle="Add Your Gains" />
         </Box>
 
         <Box>
@@ -185,7 +200,6 @@ export default function ProgressForm() {
                   setBodyPart(e.target.value);
                 }}
               />
-              
             </div>
             {exerciseData.map((item, i) => {
               return (
@@ -216,23 +230,12 @@ export default function ProgressForm() {
                         shrink: true,
                       }}
                       focused={false}
-                      onChange={(event) =>
-                        setExerciseNames(event.currentTarget.value, i)
-                      }
+                      onChange={(event) => setExerciseNames(event.currentTarget.value, i)}
                       name="exerciseName"
                       variant="outlined"
                       error={item.exerciseName.error}
-                      onBlur={(event) =>
-                        handleValidationExerciseName(
-                          i,
-                          event.currentTarget.value
-                        )
-                      }
-                      helperText={
-                        item.exerciseName.error
-                          ? "Exercise name is required"
-                          : ""
-                      }
+                      onBlur={(event) => handleValidationExerciseName(i, event.currentTarget.value)}
+                      helperText={item.exerciseName.error ? "Exercise name is required" : ""}
                     />
                     <Button
                       sx={{
@@ -294,24 +297,10 @@ export default function ProgressForm() {
                             max: 1000,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            exerciseDetailValue(
-                              i,
-                              j,
-                              "weight",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => exerciseDetailValue(i, j, "weight", event.currentTarget.value)}
                           name="weight"
                           variant="outlined"
-                          onBlur={(event) =>
-                            handleValidationExerciseDetails(
-                              i,
-                              j,
-                              "weight",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "weight", event.currentTarget.value)}
                           error={exerciseDetail.weight.error}
                           helperText={
                             exerciseDetail.weight.error
@@ -334,25 +323,11 @@ export default function ProgressForm() {
                             max: 500,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            exerciseDetailValue(
-                              i,
-                              j,
-                              "reps",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => exerciseDetailValue(i, j, "reps", event.currentTarget.value)}
                           name="reps"
                           variant="outlined"
                           error={exerciseDetail.reps.error}
-                          onBlur={(event) =>
-                            handleValidationExerciseDetails(
-                              i,
-                              j,
-                              "reps",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "reps", event.currentTarget.value)}
                           helperText={
                             exerciseDetail.reps.error
                               ? "Value must be (between 1 and 500) / Failure"
@@ -374,29 +349,13 @@ export default function ProgressForm() {
                             max: 9,
                           }}
                           focused={false}
-                          onChange={(event) =>
-                            exerciseDetailValue(
-                              i,
-                              j,
-                              "sets",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => exerciseDetailValue(i, j, "sets", event.currentTarget.value)}
                           name="sets"
                           variant="outlined"
                           error={exerciseDetail.sets.error}
-                          onBlur={(event) =>
-                            handleValidationExerciseDetails(
-                              i,
-                              j,
-                              "sets",
-                              event.currentTarget.value
-                            )
-                          }
+                          onBlur={(event) => handleValidationExerciseDetails(i, j, "sets", event.currentTarget.value)}
                           helperText={
-                            exerciseDetail.sets.error
-                              ? "Value must be between 1 and 9"
-                              : "Add number of sets."
+                            exerciseDetail.sets.error ? "Value must be between 1 and 9" : "Add number of sets."
                           }
                         />
 
@@ -412,14 +371,7 @@ export default function ProgressForm() {
                           name="notes"
                           variant="outlined"
                           helperText={"Add notes."}
-                          onChange={(event) =>
-                            exerciseDetailValue(
-                              i,
-                              j,
-                              "notes",
-                              event.currentTarget.value
-                            )
-                          }
+                          onChange={(event) => exerciseDetailValue(i, j, "notes", event.currentTarget.value)}
                         />
                         <Button
                           sx={{
@@ -441,18 +393,18 @@ export default function ProgressForm() {
               );
             })}
             <Button
-                sx={{
-                  backgroundColor: colors.blueAccent[700],
-                  color: colors.grey[100],
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  padding: "10px 20px",
-                  marginLeft: "10px",
-                }}
-                onClick={addExercise}
-              >
-                <AddIcon sx={{ mr: "10px" }} />
-                Add Exercise Names
+              sx={{
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                marginLeft: "10px",
+              }}
+              onClick={addExercise}
+            >
+              <AddIcon sx={{ mr: "10px" }} />
+              Add Exercise Names
             </Button>
             <Button
               sx={{

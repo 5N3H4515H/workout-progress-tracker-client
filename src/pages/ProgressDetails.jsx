@@ -108,7 +108,7 @@ export default function ProgressDetails() {
                   <TextField
                     disabled
                     style={{ margin: "10px" }}
-                    type="number"
+                    type="text"
                     label="Weight"
                     value={load.weight}
                     placeholder="0"
@@ -126,7 +126,7 @@ export default function ProgressDetails() {
                   <TextField
                     disabled
                     style={{ margin: "10px" }}
-                    type="number"
+                    type="text"
                     label="Reps"
                     value={load.reps}
                     placeholder="0"

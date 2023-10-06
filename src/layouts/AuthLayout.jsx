@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/slice/userSlice";
 import Sidebar from "../pages/SideBar";
 import { ColorModeContext, useMode } from "../theme";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import TopBar from "../pages/TopBar";
+import BottomNav from "../pages/BottomNav";
+import { DRAWER_WIDTH } from "../constant";
 
 const AuthLayout = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +32,7 @@ const AuthLayout = () => {
       <>
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
-            <CssBaseline />
+            {/* <CssBaseline /> */}
             <div
               className="flex-container"
               style={{
@@ -38,8 +40,9 @@ const AuthLayout = () => {
                 flexDirection: "row",
               }}
             >
+              <TopBar setIsSidebar={setIsSidebar} />
               <Sidebar isSidebar={isSidebar} />
-              <main
+              {/* <main
                 className="content"
                 style={{
                   display: "flex",
@@ -49,7 +52,19 @@ const AuthLayout = () => {
               >
                 <TopBar setIsSidebar={setIsSidebar} />
                 <Outlet />
-              </main>
+                <BottomNav/>
+              </main> */}
+              <Box
+                component="main"
+                sx={{
+                  flexGrow: 1,
+                  p: 3,
+                  width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+                }}
+              >
+                <Outlet />
+                <BottomNav />
+              </Box>
             </div>
           </ThemeProvider>
         </ColorModeContext.Provider>

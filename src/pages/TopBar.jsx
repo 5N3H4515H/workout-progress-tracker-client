@@ -1,4 +1,4 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { AppBar, Box, IconButton, useTheme, CssBaseline } from "@mui/material";
 import { useContext } from "react";
 import { ColorModeContext } from "../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -7,6 +7,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { userLogout } from "../api/userLogout";
 import { useNavigate } from "react-router-dom";
+import { DRAWER_WIDTH } from "../constant";
 
 export default function TopBar() {
   const theme = useTheme();
@@ -25,23 +26,45 @@ export default function TopBar() {
   };
 
   return (
-    <Box display="flex" justifyContent="flex-end" p={2}>
-      {/* ICONS */}
-      <Box display="flex">
-        <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton onClick={handleLogout}>
-          <LogoutIcon />
-        </IconButton>
+    <>
+      {/* // <AppBar
+    //   position="fixed"
+    //   elevation={0}
+    //   sx={{
+    //     width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+    //     ml: { sm: `${DRAWER_WIDTH}px` },
+    //   }}
+    // > */}
+      <CssBaseline />
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        p={2}
+        sx={{
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { sm: `${DRAWER_WIDTH}px` },
+        }}
+        position="fixed"
+        elevation={0}
+      >
+        {/* ICONS */}
+        <Box display="flex">
+          <IconButton onClick={colorMode.toggleColorMode}>
+            {theme.palette.mode === "dark" ? (
+              <DarkModeOutlinedIcon />
+            ) : (
+              <LightModeOutlinedIcon />
+            )}
+          </IconButton>
+          <IconButton>
+            <SettingsOutlinedIcon />
+          </IconButton>
+          <IconButton onClick={handleLogout}>
+            <LogoutIcon />
+          </IconButton>
+        </Box>
       </Box>
-    </Box>
+      {/* </AppBar> */}
+    </>
   );
 }

@@ -13,6 +13,7 @@ import {
 import { setORMData } from "../store/slice/ormSlice";
 import { getORMInfo } from "../api/ormInfo";
 import { tokens } from "../theme";
+import { Box, Typography, useTheme } from "@mui/material";
 
 export default function ORMLineChart() {
   const user = useSelector((state) => state.user.user);
@@ -27,6 +28,8 @@ export default function ORMLineChart() {
   }, [dispatch, email]);
 
   const data = useSelector((state) => state.orm.orm);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const green = tokens("dark").greenAccent[600];
   const red = tokens("dark").redAccent[600];
   const blue = tokens("dark").blueAccent[600];
@@ -64,38 +67,66 @@ export default function ORMLineChart() {
   }
 
   return (
-    <ResponsiveContainer width="100%" aspect={3}>
-      <LineChart data={sortedData} margin={{ right: 300 }}>
-        <CartesianGrid horizontal={false} vertical={false} />
-        <XAxis dataKey="timePeriod" interval={"preserveStartEnd"} />
-        <YAxis domain={[0, 300]} ticks={tickValues} />
-        <Legend />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="bench1RM"
-          stroke={green}
-          activeDot={{ r: 4 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="deadLift1RM"
-          stroke={red}
-          activeDot={{ r: 4 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="squat1RM"
-          stroke={blue}
-          activeDot={{ r: 4 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="bodyWeight"
-          stroke={primary}
-          activeDot={{ r: 4 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <>
+      {data && (
+        <>
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex"
+            height="20px"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+                marginBottom="20px"
+              >
+                One Rep Max
+              </Typography>
+            </Box>
+          </Box>
+          <ResponsiveContainer width="100%" aspect={3}>
+            <LineChart
+              data={sortedData}
+              margin={{ right: 300, bottom: 20, top: 20 }}
+            >
+              <CartesianGrid horizontal={false} vertical={false} />
+              <XAxis dataKey="timePeriod" interval={"preserveStartEnd"} />
+              <YAxis domain={[0, 300]} ticks={tickValues} />
+              <Legend />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="bench1RM"
+                stroke={green}
+                activeDot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="deadLift1RM"
+                stroke={red}
+                activeDot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="squat1RM"
+                stroke={blue}
+                activeDot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="bodyWeight"
+                stroke={primary}
+                activeDot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </>
+      )}
+    </>
   );
 }

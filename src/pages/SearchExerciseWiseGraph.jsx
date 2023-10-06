@@ -27,13 +27,13 @@ export default function SearchExerciseWiseGraph() {
   const email = user.email;
 
   const [valueToBeSearched, setValueToBeSearched] = useState("");
+  const [exerciseName, setexerciseName] = useState("");
   const [isFetched, setIsFetched] = useState();
   const [loadData, setLoadData] = useState(null);
 
   const green = tokens("dark").greenAccent[600];
   const red = tokens("dark").redAccent[600];
   const blue = tokens("dark").blueAccent[600];
-
 
   const tickInterval = 5;
   const maxTick = 300;
@@ -82,6 +82,7 @@ export default function SearchExerciseWiseGraph() {
 */
   const handleSearch = async (e) => {
     e.preventDefault();
+    setexerciseName(valueToBeSearched);
     getExerciseInfo(email, valueToBeSearched)
       .then((response) => {
         console.log("response: ", response);
@@ -97,7 +98,6 @@ export default function SearchExerciseWiseGraph() {
         {
           response.length > 0 ? "" : setIsFetched("Data Not Found!");
         }
-        navigate("/searchExercise");
       })
       .catch((error) => {
         console.log(error);
@@ -106,9 +106,14 @@ export default function SearchExerciseWiseGraph() {
 
   return (
     <>
-      <Box m="20px">
+      <Box m="20px" mb="0px">
         {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          pt="10px"
+        >
           <Header
             title="Search an Exercise Name"
             subtitle="To see it's progression"
@@ -116,7 +121,7 @@ export default function SearchExerciseWiseGraph() {
           {/* SEARCH BAR */}
           <Box
             display="flex"
-            backgroundColor={colors.primary[400]}
+            backgroundColor={colors.primary[500]}
             borderRadius="3px"
           >
             <InputBase
@@ -141,68 +146,62 @@ export default function SearchExerciseWiseGraph() {
         </Box>
       </Box>
       <Box
-        gridColumn="span 8"
-        gridRow="span 2"
-        backgroundColor={colors.primary[400]}
+        p="0 30px"
+        display="flex"
+        height="20px"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        <Box
-          mt="25px"
-          p="0 30px"
-          display="flex"
-          height="20px"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              color={colors.grey[100]}
-              marginBottom="20px"
-            >
-              {loadData && loadData.length > 0 ? valueToBeSearched : ""}
-            </Typography>
-          </Box>
-        </Box>
-        {loadData && loadData.length > 0 ? (
-          <ResponsiveContainer width="100%" aspect={3}>
-            <LineChart data={loadData} margin={{ right: 300 }}>
-              <CartesianGrid horizontal={false} vertical={false} />
-              <XAxis dataKey="date" interval={"preserveStartEnd"} />
-              <YAxis domain={[0, 300]} ticks={tickValues} />
-              <Legend />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="weight"
-                stroke={green}
-                activeDot={{ r: 4 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="reps"
-                stroke={red}
-                activeDot={{ r: 4 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="notes"
-                stroke={blue}
-                activeDot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
+        <Box>
           <Typography
             variant="h5"
             fontWeight="600"
             color={colors.grey[100]}
-            margin="10px"
+            marginBottom="20px"
           >
-            {isFetched}
+            {loadData && loadData.length > 0 ? exerciseName : ""}
           </Typography>
-        )}
+        </Box>
       </Box>
+      {loadData && loadData.length > 0 ? (
+        <ResponsiveContainer width="100%" aspect={3}>
+          <LineChart data={loadData} margin={{ right: 300, bottom: 20 }}>
+            <CartesianGrid horizontal={false} vertical={false} />
+            <XAxis dataKey="date" interval={"preserveStartEnd"} />
+            <YAxis domain={[0, 300]} ticks={tickValues} />
+            <Legend />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="weight"
+              stroke={green}
+              activeDot={{ r: 4 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="reps"
+              stroke={red}
+              activeDot={{ r: 4 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="notes"
+              stroke={blue}
+              activeDot={{ r: 4 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <Typography
+          variant="h5"
+          fontWeight="600"
+          color={colors.grey[100]}
+          marginLeft="20px"
+          pb="20px"
+        >
+          {isFetched}
+        </Typography>
+      )}
     </>
   );
 }

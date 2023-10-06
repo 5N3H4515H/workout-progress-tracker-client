@@ -1,9 +1,10 @@
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import Header from "../components/Header";
 import ORMLineChart from "../components/ORMLineChart";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
+import SearchExerciseWiseGraph from "./SearchExerciseWiseGraph";
 
 export default function DashBoard() {
   const navigate = useNavigate();
@@ -58,28 +59,13 @@ export default function DashBoard() {
       <Box
         gridColumn="span 8"
         gridRow="span 2"
+        pt="10px"
         backgroundColor={colors.primary[400]}
       >
-        <Box
-          mt="25px"
-          p="0 30px"
-          display="flex"
-          height="20px"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Box>
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              color={colors.grey[100]}
-              marginBottom="10px"
-            >
-              One Rep Max
-            </Typography>
-          </Box>
-        </Box>
         <ORMLineChart />
+      </Box>
+      <Box mt="10px" mb="10px" backgroundColor={colors.primary[400]}>
+        <SearchExerciseWiseGraph />
       </Box>
     </>
   );

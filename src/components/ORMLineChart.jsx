@@ -104,18 +104,21 @@ export default function ORMLineChart() {
                 dataKey="bench1RM"
                 stroke={green}
                 activeDot={{ r: 4 }}
+                name="bench"
               />
               <Line
                 type="monotone"
                 dataKey="deadLift1RM"
                 stroke={red}
                 activeDot={{ r: 4 }}
+                name="deadLift"
               />
               <Line
                 type="monotone"
                 dataKey="squat1RM"
                 stroke={blue}
                 activeDot={{ r: 4 }}
+                name="squat"
               />
               <Line
                 type="monotone"
